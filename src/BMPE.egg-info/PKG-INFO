@@ -1,3 +1,15 @@
+Metadata-Version: 2.4
+Name: BMPE
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: ipykernel>=7.1.0
+Requires-Dist: matplotlib>=3.10.7
+Requires-Dist: numpy>=2.3.5
+Requires-Dist: pandas>=2.3.3
+Requires-Dist: scipy>=1.16.3
+
 # Is the agent Bayesian? How?
 This repo contains the experiments we conducted for our Bayesian Modeling of Brain and Behavior Course project. Our task consisted in -----, which could be assessed at 5 different levels of difficulty.
 

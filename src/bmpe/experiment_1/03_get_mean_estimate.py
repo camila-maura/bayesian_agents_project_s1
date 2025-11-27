@@ -5,6 +5,7 @@ from scipy.optimize import curve_fit
 from scipy.stats import norm
 import os
 
+from src.utils import binomial_loglik, cum_gauss, fit_model
 # This script uses the concatenated mean obtained from the website to generate the mean estimate for experiment 1.
 
 # "data/experiment_1/website_output/processed/mean/test2/mean_outputs_experiment_1.csv"
@@ -47,30 +48,6 @@ required_cols = {
     "P_choose1", 
     "N_trials"
 }
-
-# ==========================================
-# FUNCTIONS FOR MEAN ESTIMATE
-# ==========================================
-
-def binomial_loglik(k, n, p):
-    # avoid log(0)
-    eps = 1e-9
-    p = np.clip(p, eps, 1 - eps)
-    return np.sum(k * np.log(p) + (n - k) * np.log(1 - p))
-
-
-def fit_model(x, p, n, model, p0, bounds):
-    # fit on probabilities (least squares)
-    params, pcov = curve_fit(model, x, p, p0=p0, bounds=bounds, maxfev=20000)
-    p_hat = model(x, *params)
-    ll = binomial_loglik(np.round(p * n).astype(int), n, p_hat)
-    k_params = len(params)
-    aic = 2 * k_params - 2 * ll
-    return params, aic, p_hat
-
-
-def cum_gauss(x, mu, sigma):
-    return norm.cdf((x - mu) / sigma)
 
 # df is the combined psychometric data:
 # columns expected: S1_val, S1_std, P_choose1, N_trials

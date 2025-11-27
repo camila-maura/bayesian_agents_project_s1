@@ -1,5 +1,5 @@
 [project]
-name = "bayesian_agent_prior_est"
+name = "BMPE"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"

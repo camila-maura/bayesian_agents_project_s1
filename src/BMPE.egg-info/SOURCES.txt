@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+src/BMPE.egg-info/PKG-INFO
+src/BMPE.egg-info/SOURCES.txt
+src/BMPE.egg-info/dependency_links.txt
+src/BMPE.egg-info/requires.txt
+src/BMPE.egg-info/top_level.txt
+src/modeling_project/__init__.py
+src/modeling_project/utils.py
+src/modeling_project/experiment_1/01_data_gen_meanPrior.py
+src/modeling_project/experiment_1/02_concat_mean.py
+src/modeling_project/experiment_1/03_get_mean_estimate.py
+src/modeling_project/experiment_1/04_data_gen_varPrior.py
+src/modeling_project/experiment_1/05_concat_var.py
