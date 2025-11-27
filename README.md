@@ -12,6 +12,7 @@ similarly, for level 2, level 3, level 4,...
 *I think I'm mixing up the names experiment and level in some parts. i'll come back to that later.
 
 ## Src
+```bash
 src/
 ├── bmpe/
 │   ├── utils.py
@@ -25,8 +26,10 @@ src/
 │   │   └── 01_L2_data_gen_meanPrior.py
 │   └── __pycache__/                           # python bytecode (ignored)
 └── BMPE.egg-info/                              # auto-generated when package is installed
+```
 
 ## Data Folders
+```bash
 data/
 ├── experiment_1/
 │   ├── website_input/               # Stimuli / settings fed to the online experiment
@@ -37,7 +40,7 @@ data/
 │       └── processed/               # Cleaned or aggregated data ready for analysis
 │
 └── level_2/                         # Data for level-2 experiments
-
+```
 
 
 ## Authors:
