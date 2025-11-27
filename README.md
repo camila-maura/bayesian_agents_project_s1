@@ -5,6 +5,8 @@ This repo contains the experiments we conducted for our Bayesian Modeling of Bra
 Clone the repository
 uv sync to create virtual environment from pyproject.toml
 
+run files in experiment_1 in order, respecting the stops to upload and download data from the website. Then refer to the notebook for step by step explanation.
+
 ## Src
 - data_gen contains the code to generate --- 
 - notebooks contains explanation notebooks of the experiments for the corresponding level (1 to 5). One notebook per level

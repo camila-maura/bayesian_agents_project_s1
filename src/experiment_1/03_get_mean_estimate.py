@@ -7,7 +7,7 @@ import os
 
 # This script uses the concatenated mean obtained from the website to generate the mean estimate for experiment 1.
 
-"data/experiment_1/website_output/processed/mean/test2/mean_outputs_experiment_1.csv"
+# "data/experiment_1/website_output/processed/mean/test2/mean_outputs_experiment_1.csv"
 
 # ==========================================
 # LOAD DATA
@@ -21,9 +21,7 @@ test_n = 2
 test = f"test{test_n}"
 input_file_name = "mean_outputs_experiment_1.csv"
 
-output_file_name = "mean_estimate_experiment_1.csv"
-
-folder_input = os.path.join(
+folder = os.path.join(
     data_dir,
     experiment_name,
     source_of_data,
@@ -31,15 +29,28 @@ folder_input = os.path.join(
     type_of_var,
     test
 )
-input_file = os.path.join(folder_input, input_file_name)
+
+input_file = os.path.join(folder, input_file_name)
+
+output_file_name = "mean_estimate_experiment_1.npy"
+
+output_file = os.path.join(
+    folder, 
+    output_file_name)
 
 df = pd.read_csv(input_file)
-required_cols = {"S1_std", "S2_std", "S1_val", "S2_val", "P_choose1", "N_trials"}
+required_cols = {
+    "S1_std", 
+    "S2_std", 
+    "S1_val", 
+    "S2_val", 
+    "P_choose1", 
+    "N_trials"
+}
 
 # ==========================================
 # FUNCTIONS FOR MEAN ESTIMATE
 # ==========================================
-
 
 def binomial_loglik(k, n, p):
     # avoid log(0)
@@ -70,8 +81,7 @@ group_pool = (
       .apply(lambda g: pd.Series({
           "P_choose1": np.average(g["P_choose1"], weights=g["N_trials"]),
           "N_trials":  g["N_trials"].sum()
-      }))
-      .reset_index()
+      })).reset_index()
 )
 
 x_data = group_pool["S1_val"].values.astype(float)
@@ -95,8 +105,9 @@ probit_params, probit_aic, probit_p = fit_model(
 )
 
 mu_probit, sigma_probit = probit_params
-
-params = np.array(probit_params)
-np.save("params.npy", params)
-
 print(f"Probit:   mu={mu_probit:.4f}, sigma={sigma_probit:.4f}")
+
+mu_probit = np.array(mu_probit)
+print(output_file)
+np.save(output_file, mu_probit)
+
