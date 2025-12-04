@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+import argparse
 
 ## Get the thing to input to the agents website - input data for variance
 ## mu_0_est comes from estimate from 03_get_mean_estimate.py and its located in mean_estimate_experiment_1.npy
@@ -134,6 +135,30 @@ def make_data_var(experiment_n,
     print("S1_std levels:", s1_std_series)
     print("Number of S1_std levels:", len(s1_std_series))
     print("Total trials:", len(df))
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--ex_n", type=int, default=None)
+    parser.add_argument("--starts1", type=float, default=-4.0)
+    parser.add_argument("--ends1", type=float, default=4.0)
+    parser.add_argument("--incs1", type=float, default=0.1)
+    parser.add_argument("--startstds1", type=float, default=0.7)
+    parser.add_argument("--endstds1", type=float, default=1.3)
+    parser.add_argument("--s2std", type=float, default=0.005)
+    parser.add_argument("--simetric", type=bool, default=True)
+    args = parser.parse_args()
+    if args.ex_n:
+        make_data_var(args.ex_n, 
+                      args.starts1, 
+                      args.ends1, 
+                      args.incs1, 
+                      args.startstds1,
+                      args.endstds1,
+                      args.s2std,
+                      args.simetric)
+    else:
+        ValueError("Experiment number needs to be defined!")
 
 #TODO
 #problem -> inputting too high and low variances. we need to find "sweet spots"
