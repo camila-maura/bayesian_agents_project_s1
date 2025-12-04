@@ -10,7 +10,8 @@ import argparse
 # LOAD DATA
 # ==========================================
 # Source for prior mean estimate
-def make_data_var(experiment_n, 
+def make_data_var(experiment_n,
+                  mean_prio = -0.81,
                   s1vl_start = -4.0, 
                   s1vl_end = 4.0, 
                   s1vl_inc = 0.2, 
@@ -19,7 +20,7 @@ def make_data_var(experiment_n,
                   s2std = 0.005, 
                   simetric = True ):
     data_dir = "data"
-    experiment_name = f"experiment_{experiment_n}"
+    experiment_name = "experiment_1"
     source_of_data = "website_output"   
     type_of_data_input = "processed"
     type_of_var = "mean"
@@ -50,7 +51,7 @@ def make_data_var(experiment_n,
         source_of_data,
         type_of_var,
     )
-    file_name_output = f"var_inputs_{experiment_name}.csv"
+    file_name_output = f"var_inputs_experiment_{experiment_n}.csv"
     output_filename = os.path.join(folder, file_name_output)
 
     # =====================================
@@ -58,7 +59,7 @@ def make_data_var(experiment_n,
     # =====================================
 
     # Plug in your current prior-mean estimate from the mean experiment
-    mu0_est = np.load(input_filename)
+    mu0_est = mean_prio#np.load(input_filename)
     print("Loaded prior mean estimate (μ0):", mu0_est)
 
     # S1 sweep around prior mean
@@ -81,7 +82,7 @@ def make_data_var(experiment_n,
     #low_mid = np.geomspace(s1std_start - 0.4 , s1std_start - 0.1, num=4)
 
     # dense sampling in prior-dominant regime
-    dense_prior = np.geomspace(s1std_start, s1std_end, num=20)
+    dense_prior = np.geomspace(s1std_start, s1std_end, num=30)
 
     # a few very noisy levels to see asymptote more clearly
     #high = np.geomspace(s1std_end + 0.1, s1std_end + 3, num=4)
@@ -140,6 +141,7 @@ def make_data_var(experiment_n,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--ex_n", type=int, default=None)
+    parser.add_argument("--mean_pri", type=float, default=-0.81)
     parser.add_argument("--starts1", type=float, default=-4.0)
     parser.add_argument("--ends1", type=float, default=4.0)
     parser.add_argument("--incs1", type=float, default=0.1)
@@ -149,7 +151,8 @@ if __name__ == "__main__":
     parser.add_argument("--simetric", type=bool, default=True)
     args = parser.parse_args()
     if args.ex_n:
-        make_data_var(args.ex_n, 
+        make_data_var(args.ex_n,
+                      args.mean_pri, 
                       args.starts1, 
                       args.ends1, 
                       args.incs1, 
@@ -159,6 +162,3 @@ if __name__ == "__main__":
                       args.simetric)
     else:
         ValueError("Experiment number needs to be defined!")
-
-#TODO
-#problem -> inputting too high and low variances. we need to find "sweet spots"

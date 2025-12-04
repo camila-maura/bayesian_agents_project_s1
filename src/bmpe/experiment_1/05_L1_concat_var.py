@@ -25,7 +25,7 @@ source_of_data = "website_output"
 
 type_of_data_input = "raw"
 type_of_var = "variance"
-test_n = 8
+test_n = 14
 test = f"test{test_n}"
 input_pattern = "experiment_results-*.csv"
 
