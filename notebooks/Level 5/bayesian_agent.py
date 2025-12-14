@@ -63,7 +63,7 @@ class BayesianReplica():
         var_list = []
         for obs in measurement:
             obs_var = (self.sigma_internal ** 2 + measurement_noise ** 2)
-            kalman_gain = self.P / (self.P + obs_var)
+            kalman_gain = self.P / (self.P + obs_var) 
 
             self.mu_prior = self.mu_prior + kalman_gain * (obs - self.mu_prior)
             self.sigma_prior = np.sqrt((1 - kalman_gain) * (self.sigma_prior ** 2))
