@@ -120,7 +120,7 @@ def find_mu(file):
     k_data = np.round(p_data * n_data).astype(int)   # approximate counts
 
     # sanity check: monotonic-ish
-    print(group_pool.head())
+    #print(group_pool.head())
 
     # initial guesses: threshold ~ where p ~ 0.5
     idx50 = np.argmin(np.abs(p_data - 0.5))

@@ -24,13 +24,13 @@ def concat_mean(pattern):
         try:
             tmp = pd.read_csv(f)
         except Exception as e:
-            print(f"[WARN] Could not read {f}: {e}")
+            #print(f"[WARN] Could not read {f}: {e}")
             continue
 
         # Basic sanity: must have at least the core columns
         required_cols = {"S1_val", "S1_std", "S2_val", "S2_std"}
         if not required_cols.issubset(tmp.columns):
-            print(f"[WARN] Skipping {f}: missing some of {required_cols}")
+            #print(f"[WARN] Skipping {f}: missing some of {required_cols}")
             continue
 
         # Robustly handle decision column naming
@@ -40,7 +40,7 @@ def concat_mean(pattern):
                 decision_col = cand
                 break
         if decision_col is None:
-            print(f"[WARN] Skipping {f}: no decision column found.")
+            #print(f"[WARN] Skipping {f}: no decision column found.")
             continue
 
         # Keep only what we need, rename decision
@@ -62,14 +62,14 @@ def concat_mean(pattern):
 
     df = pd.concat(df_list, ignore_index=True)
 
-    print(f"[INFO] Loaded {len(df)} total trials from {len(df_list)} files.")
+    #print(f"[INFO] Loaded {len(df)} total trials from {len(df_list)} files.")
 
     # ==========================================
     # OPTIONAL SANITY CHECKS FOR THIS SETUP
     # ==========================================
-    print("\n[INFO] Unique S2_val:", df["S2_val"].unique())
-    print("[INFO] Unique S2_std:", df["S2_std"].unique())
-    print("[INFO] Example S1_std values:", sorted(df["S1_std"].unique())[:10], "...")
+    #print("\n[INFO] Unique S2_val:", df["S2_val"].unique())
+    #print("[INFO] Unique S2_std:", df["S2_std"].unique())
+    #print("[INFO] Example S1_std values:", sorted(df["S1_std"].unique())[:10], "...")
 
     # ==========================================
     # COMPUTE PSYCHOMETRIC POINTS
@@ -89,9 +89,9 @@ def concat_mean(pattern):
     # SAVE OUTPUT
     # ==========================================
 
-    print("\n[INFO] Saved combined psychometric data to:", OUTPUT_FILE)
-    print(grouped.head())
-    print("\n[INFO] Unique S1_std in combined data:", sorted(grouped["S1_std"].unique()))
+   # print("\n[INFO] Saved combined psychometric data to:", OUTPUT_FILE)
+    #print(grouped.head())
+    #print("\n[INFO] Unique S1_std in combined data:", sorted(grouped["S1_std"].unique()))
 
 
     return grouped

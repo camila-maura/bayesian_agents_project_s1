@@ -2,27 +2,6 @@ import numpy as np
 from scipy.stats import norm
 import math
 
-def double_factorial(n: int) -> int:
-    """Compute n!! = 1*3*5*...*n for odd n, or 2*4*6*...*n for even n"""
-    if n <= 0:
-        return 1
-    else:
-        return n * double_factorial(n - 2)
-
-def var_Xn_zero_mean(sigma: float, n: int) -> float:
-    """
-    Variance of X^n for X ~ N(0, sigma^2)
-    """
-    if n == 0:
-        return 0.0
-    # nth raw moment
-    if n % 2 == 0:  # even n
-        E_Xn = double_factorial(n - 1) * sigma**n
-    else:           # odd n
-        E_Xn = 0.0
-    # 2n-th raw moment
-    E_X2n = double_factorial(2*n - 1) * sigma**(2*n)
-    return E_X2n - E_Xn**2
 
 class BayesianReplica():
     def __init__(self, mu_prior, sigma_prior, sigma_internal, eks_s = 0, P_init=1.0):
@@ -37,6 +16,7 @@ class BayesianReplica():
         self.P_sigma = P_init**2
 
     def decision_task(self, s1, s2, sigma1, sigma2):
+        "Decision task: replicate original website agent"
         v1 = sigma1**2 + self.sigma_internal**2
         v2 = sigma2**2 + self.sigma_internal**2
 
@@ -57,6 +37,7 @@ class BayesianReplica():
     
 
     def train_agent_kalmann_m_noise(self, n_trials, final_mean, final_std, measurement_noise):
+        "Simple Kalman filter updating both mean and variance"
         sample = np.random.normal(final_mean, final_std, n_trials)
         measurement = sample + np.random.normal(0, measurement_noise, n_trials)
         mean_list = []
@@ -66,14 +47,15 @@ class BayesianReplica():
             kalman_gain = self.P / (self.P + obs_var) 
 
             self.mu_prior = self.mu_prior + kalman_gain * (obs - self.mu_prior)
-            self.sigma_prior = np.sqrt((1 - kalman_gain) * (self.sigma_prior ** 2))
+            self.sigma_prior = np.sqrt((1 - kalman_gain) * (self.sigma_prior ** 2)) # 1-Kalman Gain * P
             self.P = (1 - kalman_gain) * self.P
             mean_list.append(self.mu_prior)
             var_list.append(self.sigma_prior)
-        
+
         return mean_list, var_list 
     
     def train_agent_kalmann_pred_error(self, n_trials, final_mean, final_std, measurement_noise):
+        "Kalman filter updating mean and variance updated based on prediction error"
         sample = np.random.normal(final_mean, final_std, n_trials)
         measurement = sample + np.random.normal(0, measurement_noise, n_trials)
         mean_list = []
@@ -87,17 +69,16 @@ class BayesianReplica():
             mean_list.append(self.mu_prior)
 
             z = obs - self.mu_prior
-            self.sigma_prior = np.sqrt(self.sigma_prior**2 + kalman_gain * (z**2 - self.sigma_prior**2))
+            self.sigma_prior = np.sqrt(self.sigma_prior**2 + kalman_gain * (z**2 - self.sigma_prior**2)) # Euclidean distance between predicted and observed
             var_list.append(self.sigma_prior)
-        
-        return mean_list, var_list
-    
-        
         return mean_list, var_list
     
     
     def train_agent_EKF_sq_residuals(self, n_trials, final_mean, final_std, measurement_noise):
-        
+        '''
+        Correct Extended Kalman Filter updating variance based on squared residuals and
+        exponential function for sigma
+        '''
         sample = np.random.normal(final_mean, final_std, n_trials)
         measurement = sample + np.random.normal(0, measurement_noise, n_trials)
 
@@ -133,16 +114,16 @@ class BayesianReplica():
         mean_list = []
         var_list = []
         for obs in measurement:
-            obs_var = (self.sigma_internal ** 2 + measurement_noise ** 2)
+            obs_var = (self.sigma_internal * 2 + measurement_noise * 2)
             z = abs(obs - self.mu_prior)
 
             sigma = np.exp(self.eks_s)
             c = np.sqrt(2 / np.pi)
-            h_s = c * sigma 
+            h_s = np.sqrt(sigma**2 + obs_var) * c
 
-            H = c * sigma
+            H = c * 2 * sigma * sigma / (2 * np.sqrt(sigma**2 + obs_var))
 
-            R = h_s**2 * (np.pi / 2 - 1)
+            R = (sigma**2 + obs_var) * (1 - 2/np.pi)
             S = H * self.P_sigma * H + R
             K = self.P_sigma * H / S
 
@@ -151,7 +132,7 @@ class BayesianReplica():
 
             self.P_sigma = (1 - K * H) * self.P_sigma
 
-            self.sigma_prior = np.sqrt(self.P)
+            self.sigma_prior = np.exp(self.eks_s)
             mean_list.append(self.mu_prior)
             var_list.append(self.sigma_prior)
 
