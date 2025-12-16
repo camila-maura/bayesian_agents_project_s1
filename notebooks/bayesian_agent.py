@@ -54,6 +54,24 @@ class BayesianReplica():
 
         return mean_list, var_list 
     
+    def train_agent_kalmann_m_noise_pure_mean(self, n_trials, final_mean, final_std, measurement_noise):
+        "Simple Kalman filter updating both mean and variance"
+        sample = np.random.normal(final_mean, final_std, n_trials)
+        measurement = sample + np.random.normal(0, measurement_noise, n_trials)
+        mean_list = []
+        var_list = []
+        for obs in measurement:
+            obs_var = (self.sigma_internal ** 2 + measurement_noise ** 2)
+            kalman_gain = self.P / (self.P + obs_var) 
+
+            self.mu_prior = self.mu_prior + kalman_gain * (obs - self.mu_prior)
+            # self.sigma_prior = np.sqrt((1 - kalman_gain) * (self.sigma_prior ** 2)) # 1-Kalman Gain * P
+            self.P = (1 - kalman_gain) * self.P
+            mean_list.append(self.mu_prior)
+            var_list.append(self.sigma_prior)
+
+        return mean_list, var_list 
+    
     def train_agent_kalmann_pred_error(self, n_trials, final_mean, final_std, measurement_noise):
         "Kalman filter updating mean and variance updated based on prediction error"
         sample = np.random.normal(final_mean, final_std, n_trials)
@@ -100,7 +118,41 @@ class BayesianReplica():
 
             self.eks_s = self.eks_s + K * (z - h_s)
             self.sigma_prior = np.exp(self.eks_s)
-            self.P_sigma = (1.0 - K * H) * self.P_sigma  # process noise
+            self.P_sigma = (1.0 - K * H) * self.P_sigma 
+            self.mu_prior =  self.mu_prior + K * (obs - self.mu_prior)
+
+            mean_list.append(self.mu_prior)
+            var_list.append(self.P_sigma)
+        return mean_list, var_list
+    
+    def train_agent_EKF_sq_residuals_pure_var(self, n_trials, final_mean, final_std, measurement_noise):
+        '''
+        Correct Extended Kalman Filter updating variance based on squared residuals and
+        exponential function for sigma
+        '''
+        sample = np.random.normal(final_mean, final_std, n_trials)
+        measurement = sample + np.random.normal(0, measurement_noise, n_trials)
+
+        mean_list = []
+        var_list = []
+        for obs in measurement:
+
+            obs_noise = measurement_noise**2 + self.sigma_internal**2
+            sigma = np.exp(self.eks_s)
+            h_s = sigma**2 + obs_noise
+
+            z = (obs - self.mu_prior)**2 
+
+            H = 2 * sigma * sigma
+
+            R = 2 * h_s**2
+            S = H * self.P * H + R
+            K = self.P * H / S
+
+            self.eks_s = self.eks_s + K * (z - h_s)
+            self.sigma_prior = np.exp(self.eks_s)
+            self.P_sigma = (1.0 - K * H) * self.P_sigma 
+            # self.mu_prior =  self.mu_prior + K * (obs - self.mu_prior)
 
             mean_list.append(self.mu_prior)
             var_list.append(self.P_sigma)
@@ -131,7 +183,35 @@ class BayesianReplica():
             self.sigma_prior = np.exp(self.eks_s)
 
             self.P_sigma = (1 - K * H) * self.P_sigma
+            self.mu_prior = self.mu_prior + K * (obs - self.mu_prior)
+            self.sigma_prior = np.exp(self.eks_s)
+            mean_list.append(self.mu_prior)
+            var_list.append(self.sigma_prior)
 
+    def train_agent_EKF_absolute_pure_var(self, n_trials, final_mean, final_std, measurement_noise):
+        sample = np.random.normal(final_mean, final_std, n_trials)
+        measurement = sample + np.random.normal(0, measurement_noise, n_trials)
+        mean_list = []
+        var_list = []
+        for obs in measurement:
+            obs_var = (self.sigma_internal * 2 + measurement_noise * 2)
+            z = abs(obs - self.mu_prior)
+
+            sigma = np.exp(self.eks_s)
+            c = np.sqrt(2 / np.pi)
+            h_s = np.sqrt(sigma**2 + obs_var) * c
+
+            H = c * 2 * sigma * sigma / (2 * np.sqrt(sigma**2 + obs_var))
+
+            R = (sigma**2 + obs_var) * (1 - 2/np.pi)
+            S = H * self.P_sigma * H + R
+            K = self.P_sigma * H / S
+
+            self.eks_s = self.eks_s + K * (z - h_s)
+            self.sigma_prior = np.exp(self.eks_s)
+
+            self.P_sigma = (1 - K * H) * self.P_sigma
+            self.mu_prior = self.mu_prior + K * (obs - self.mu_prior)
             self.sigma_prior = np.exp(self.eks_s)
             mean_list.append(self.mu_prior)
             var_list.append(self.sigma_prior)
