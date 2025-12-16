@@ -14,6 +14,8 @@ class BayesianReplica():
         self.safety_P = P_init
         self.eks_s = eks_s
         self.P_sigma = P_init**2
+        
+    
 
     def decision_task(self, s1, s2, sigma1, sigma2):
         "Decision task: replicate original website agent"
@@ -106,9 +108,8 @@ class BayesianReplica():
             var_list.append(self.P_sigma)
         return mean_list, var_list
 
-    
-    
-    def train_agent_EKF_absolute(self, n_trials, final_mean, final_std, measurement_noise):
+    def train_agent_EKF_absolute(self, n_trials, final_mean, 
+                                 final_std, measurement_noise):
         sample = np.random.normal(final_mean, final_std, n_trials)
         measurement = sample + np.random.normal(0, measurement_noise, n_trials)
         mean_list = []
@@ -244,8 +245,40 @@ class BayesianReplica():
 
     def get_prior(self):
         return self.mu_prior, self.sigma_prior
+
+
+    def train_variational_bayes(
+        self, n_trials, final_mean, final_std, measurement_noise, alpha_mu=0.1, alpha_sigma=0.05):
         
+        sample = np.random.normal(final_mean, final_std, n_trials)
+        measurement = sample + np.random.normal(0, measurement_noise, n_trials)
+        mean_list = []
+        var_list = []
+        count = 0
+        for obs in measurement:
+            if count%500 == 0 and count != 0:
+                alpha_mu = alpha_mu / 10
+            count = count + 1
+            sigma = np.sqrt(self.sigma_internal**2 + measurement_noise**2 + self.sigma_prior**2)
+            sigma_obs = np.sqrt(self.sigma_internal**2 + measurement_noise**2)
+            mu_pred = self.mu_prior
+            sigma_pred = self.sigma_prior**2 + self.sigma_internal**2 + measurement_noise**2
+            for _ in range(5):
+                grad_mu = (obs - self.mu_prior) / sigma_obs**2
+                grad_sigma = ((obs - self.mu_prior)**2 - (sigma_obs**2 + self.sigma_prior**2)) / (self.sigma_prior**3)
 
-    
+                grad_mu_KL = - (self.mu_prior - mu_pred) / sigma_pred
+                grad_sigma_KL = 1/self.sigma_prior - self.sigma_prior / sigma_pred
 
+                grad_mu += grad_mu_KL
+                grad_sigma += grad_sigma_KL
 
+                self.mu_prior += alpha_mu * grad_mu
+
+                self.sigma_prior += alpha_sigma * grad_sigma    
+                self.sigma_prior = max(self.sigma_prior, 1e-3)
+
+            var_list.append(self.sigma_prior)
+            mean_list.append(self.mu_prior)
+
+        return mean_list, var_list
