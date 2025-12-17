@@ -9,6 +9,7 @@ Requires-Dist: matplotlib>=3.10.7
 Requires-Dist: numpy>=2.3.5
 Requires-Dist: pandas>=2.3.3
 Requires-Dist: scipy>=1.16.3
+Requires-Dist: seaborn>=0.13.2
 
 # Is the agent Bayesian? How?
 This repo contains the experiments we conducted for our Bayesian Modeling of Brain and Behavior Course project. Our task consisted in estimate different hidden cognitive variables of simulated bayesian agents. We had to estimate a different set of variables for each of the 5 proposed levels of difficulty. 

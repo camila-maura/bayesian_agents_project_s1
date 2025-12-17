@@ -25,7 +25,7 @@ source_of_data = "website_output"
 
 type_of_data_input = "raw"
 type_of_var = "variance"
-test_n = 14
+test_n = 9
 test = f"test{test_n}"
 input_pattern = "experiment_results-*.csv"
 
@@ -139,14 +139,13 @@ if len(df["S2_val"].unique()) != 1:
 # We only need P(choose S1) vs (S1_std, S1_val)
 # ==========================================
 grouped = (
-    df.groupby(["S1_std", "S1_val"])["Decision"]
-      .agg(P_choose1="mean", N_trials="count")
-      .reset_index()
+    df.groupby(["S1_std", "S2_std", "S2_val", "S1_val"])["Decision"]
+    .agg(P_choose1="mean", N_trials="count")
+    .reset_index()
 )
 
-# sort for plotting and fitting
+# Sort nicely
 grouped = grouped.sort_values(["S1_std", "S1_val"]).reset_index(drop=True)
-
 # ==========================================
 # SAVE PSYCHOMETRIC DATA
 # ==========================================
