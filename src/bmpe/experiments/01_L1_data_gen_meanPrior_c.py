@@ -1,13 +1,7 @@
 import pandas as pd
 import numpy as np
-import os
-import argparse
 
 # This script generates all experiments' data
-
-# ==========================================
-# CONFIG
-# ==========================================
 
 def make_data_experiment_4(
     # We will fix the reference cue (S2) to be very noisy.
