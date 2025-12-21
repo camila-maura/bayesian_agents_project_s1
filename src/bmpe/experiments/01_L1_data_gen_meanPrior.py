@@ -9,7 +9,70 @@ import argparse
 # CONFIG
 # ==========================================
 
-def make_data(experiment_n, start=-4.0, end=4.0, inc=0.1):
+
+def make_data_experiment_4(
+    # We will fix the reference cue (S2) to be very noisy.
+    # This will ensure that the agent relies mostly on its prior.
+    s2_vals_set = 0.0, 
+    s1_vals_min=-4.0,
+    s1_vals_max=4.0,
+    s1_vals_step = 0.1,
+    trials_per_s1_value = 50,
+    s2_std_vals_set = 8,
+    s1_std_vals_set = 2 
+    
+):
+    '''
+    Prior parameter estimation experiment
+    '''
+    s1_vals_set = np.arange(
+        s1_vals_min,
+        s1_vals_max,
+        s1_vals_step
+    )
+    n_trials_total = (
+        (s1_vals_max - s1_vals_min)/0.1
+        ) * trials_per_s1_value
+    
+    s1_vals = np.repeat(
+        s1_vals_set,
+        trials_per_s1_value
+    )
+    s2_vals = np.repeat(
+        s2_vals_set,
+        n_trials_total
+    )
+    s1_std_vals = np.repeat(
+        s1_std_vals_set,
+        n_trials_total
+    )
+    s2_std_vals = np.repeat(
+        s2_std_vals_set,
+        n_trials_total
+    )
+    return s1_vals, s2_vals, s1_std_vals, s2_std_vals
+
+def concat_data(s1_vals, s2_vals, s1_std_vals, s2_std_vals):
+    # Store in dataframe
+    trial_ids = np.arange(0, len(s1_vals))
+    exp_dic = {
+        "Trial": trial_ids,
+        "S1_val": s1_vals,
+        "S2_val": s2_vals,
+        "S1_std": s1_std_vals,
+        "S2_std": s2_std_vals,
+    }
+    
+    exp_df = pd.DataFrame(exp_dic)
+    return exp_df
+    
+
+def make_data(
+    experiment_n, 
+    start=-4.0, 
+    end=4.0, 
+    inc=0.1
+):
     # === REFERENCE ===
     # We will fix the reference cue (S2) to be very noisy.
     # This will ensure that the agent relies mostly on its prior.
