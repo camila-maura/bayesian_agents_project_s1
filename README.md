@@ -1,15 +1,23 @@
 # Is the agent Bayesian? How?
-This repo contains the experiments we conducted for our Bayesian Modeling of Brain and Behavior Course project. Our task consisted in estimate different hidden cognitive variables of simulated bayesian agents. We had to estimate a different set of variables for each of the 5 proposed levels of difficulty. 
+
+== This repository is a work in progress ==
+
+This repo contains the data analysis and figure reproduction explanation for our Bayesian MOdeling of Brain and Behavior course, as part of the M1 S1 Cognitive Science (Computational Neuroscience and AI track)
+
+Our task consisted in estimating different hidden cognitive variables of simulated bayesian agents. 
 
 ## How to use?
 Clone the repository
-uv sync to create virtual environment from pyproject.toml
+```
+git clone blabla
+````
+Initialize a virtual environment from the project.toml
+```uv sync to create virtual environment from pyproject.toml```
 
 run files in level 1 in order, respecting the stops to upload and download data from the website. Then refer to the notebook for step by step explanation.
 
 similarly, for level 2, level 3, level 4,...
 
-*I think I'm mixing up the names experiment and level in some parts. i'll come back to that later.
 
 ## src
 ```bash

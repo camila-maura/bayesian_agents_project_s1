@@ -119,9 +119,6 @@ def find_mu(file):
     n_data = group_pool["N_trials"].values.astype(int)
     k_data = np.round(p_data * n_data).astype(int)   # approximate counts
 
-    # sanity check: monotonic-ish
-    #print(group_pool.head())
-
     # initial guesses: threshold ~ where p ~ 0.5
     idx50 = np.argmin(np.abs(p_data - 0.5))
     mu_guess = x_data[idx50]

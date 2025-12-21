@@ -32,3 +32,4 @@ def cum_gauss(x, mu, sigma):
 def logistic(x, mu, s):
     # classic logistic psychometric
     return 1.0 / (1.0 + np.exp(-(x - mu) / s))
+
